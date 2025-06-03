@@ -3,4 +3,4 @@ Enter The Gungeon Mobile Port APK
 
 In Releases
 
-Updated v1.0.294 Nov 18 2024
+Updated 1.0.301 June 2 2025
