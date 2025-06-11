@@ -45,6 +45,7 @@ bool returnToFoyer = false;
 bool showLoginScreen = false;
 int camScale = 1;
 bool setCamScale = false;
+bool enableEnglish = true;
 
 
 
@@ -93,10 +94,20 @@ void GameManager_Update(Il2CppObject *instance) {
     return instance->invoke_method<void>("Update");
 }
 
+Il2CppObject* getSettingData(Il2CppObject *instance) {
+    if (enableEnglish) {
+        instance->invoke_method<void>("ApplyLanguage", 10);
+        enableEnglish = false;
+    }
+
+    return instance->invoke_method<Il2CppObject*>("get_SettingData");
+}
+
 
 void OnLoginClick(Il2CppObject *instance) {
     LOGD("OnLoginClick");
     enterMainScene = true;
+    enableEnglish = true;
 }
 
 void DoShowBestiary(Il2CppObject *instance, Il2CppObject *control, Il2CppObject *mouseEvent) {
@@ -162,6 +173,7 @@ void *hack_thread(void *)
     REPLACE_NAME("GameMain.ProcedureLogin", "OnLoginClick", OnLoginClick);
     REPLACE_NAME("PauseMenuController", "DoShowBestiary", DoShowBestiary);
     REPLACE_NAME("GameManager", "DoGameOver", DoGameOver);
+    REPLACE_NAME("SettingService", "get_SettingData", getSettingData);
 
     //REPLACE_NAME_ORIG("Game.Sample.Class", ".ctor", Class_ctor, o_Class_ctor);
 
@@ -212,6 +224,7 @@ void Changes(JNIEnv *env, [[maybe_unused]] jclass clazz, [[maybe_unused]] jobjec
         case 0:
         {
             enterMainScene = true;
+            enableEnglish = true;
             break;
         }
         case 1:
@@ -227,6 +240,7 @@ void Changes(JNIEnv *env, [[maybe_unused]] jclass clazz, [[maybe_unused]] jobjec
         case 3:
         {
             charSelect = true;
+            enableEnglish = true;
             break;
         }
         case 4:
