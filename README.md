@@ -5,6 +5,9 @@ Updated 1.0.301 June 2 2025
 
 Saves are stored at Android/data/com.xd.etg.taptap/files/SlotA_****.save -- You can replace with your PC saves
 
+
+![image](https://github.com/user-attachments/assets/abc35ae2-fdf3-47f8-8f6e-f752f8019a23)
+
 ## Getting Started
 Clone the repository
 ```console
