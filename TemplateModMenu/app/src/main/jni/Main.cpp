@@ -14,6 +14,8 @@
 #define targetLibName OBFUSCATE("libil2cpp.so")
 
 Il2CppImage *g_Image = nullptr;
+Il2CppImage *unityCore = nullptr;
+//Il2CppImage *msCore = nullptr;
 
 // exmaple dump.cs
 // class Game.Sample.Class //Assembly-CSharp
@@ -46,7 +48,7 @@ bool showLoginScreen = false;
 int camScale = 1;
 bool setCamScale = false;
 bool enableEnglish = true;
-
+Il2CppObject* proOfflineCont = nullptr;
 
 
 
@@ -57,6 +59,7 @@ void GameManager_Update(Il2CppObject *instance) {
         if(enterMainScene) {
             instance->invoke_method<void>("EnterMainScene", 1);
             enterMainScene = false;  // because we only want to call the method once
+            enableEnglish = true;
         }
         if (forceUnpause) {
             instance->invoke_method<void>("ForceUnpause");
@@ -70,6 +73,7 @@ void GameManager_Update(Il2CppObject *instance) {
         if (charSelect) {
             instance->invoke_method<void>("LoadCharacterSelect", 1, 0, 0);
             charSelect = false;
+            enableEnglish = true;
         }
         if (returnToFoyer) {
             instance->invoke_method<void>("ReturnToFoyer");
@@ -104,6 +108,7 @@ Il2CppObject* getSettingData(Il2CppObject *instance) {
 }
 
 
+
 void OnLoginClick(Il2CppObject *instance) {
     LOGD("OnLoginClick");
     enterMainScene = true;
@@ -112,6 +117,7 @@ void OnLoginClick(Il2CppObject *instance) {
 
 void DoShowBestiary(Il2CppObject *instance, Il2CppObject *control, Il2CppObject *mouseEvent) {
     LOGD("DoShowBestiary");
+    forceUnpause = true;
 }
 
 void DoGameOver(Il2CppObject *instance, Il2CppObject *gameOverSource) {
@@ -119,8 +125,54 @@ void DoGameOver(Il2CppObject *instance, Il2CppObject *gameOverSource) {
     returnToFoyer = true;
 }
 
+void (*o_Class_ctor)(Il2CppObject *);
+void Class_ctor(Il2CppObject *instance)
+{
+    o_Class_ctor(instance);
+    proOfflineCont = instance;
+}
 
 
+/*
+Il2CppObject* FindProcedureOfflineContinue() {
+    // Get the ProcedureOfflineContinue class
+    auto objectClass = unityCore->getClass("UnityEngine.Object");
+    if (objectClass == nullptr) {
+        LOGD("Failed to find Object class");
+        return nullptr;
+    }
+
+    auto procedureClass = g_Image->getClass("GameMain.ProcedureOfflineContinue");
+    if (procedureClass == nullptr) {
+        LOGD("Failed to find ProcedureOfflineContinue class");
+        return nullptr;
+    }
+
+    // Get the method and inflate it with the generic type parameter
+    auto method = objectClass->getMethod("FindFirstObjectByType", 0);
+    if (method == nullptr) {
+        LOGD("Failed to find FindFirstObjectByType method");
+        return nullptr;
+    }
+
+    // Inflate the method with the generic type parameter
+    auto inflatedMethod = method->inflate({procedureClass});
+    if (inflatedMethod == nullptr) {
+        LOGD("Failed to inflate FindFirstObjectByType method");
+        return nullptr;
+    }
+
+    // Call the inflated method
+    auto procedureInstance = inflatedMethod->invoke_static<Il2CppObject*>();
+    
+    if (procedureInstance == nullptr) {
+        LOGD("No ProcedureOfflineContinue instance found");
+        return nullptr;
+    }
+
+    return procedureInstance;
+}
+*/
 
 struct UnityEngine_Vector3
 {
@@ -133,6 +185,8 @@ void Class_set_Position(Il2CppObject *instance, UnityEngine_Vector3 pos)
     pos.x += 1;
     return instance->invoke_method<void>("set_Position", pos);
 }
+
+
 
 void (*o_Class_ctor)(Il2CppObject *);
 void Class_ctor(Il2CppObject *instance)
@@ -167,6 +221,8 @@ void *hack_thread(void *)
 
     LOGD(OBFUSCATE("HOOKING..."));
     g_Image = Il2cpp::GetAssembly("Assembly-CSharp")->getImage();
+    unityCore = Il2cpp::GetAssembly("UnityEngine.CoreModule")->getImage();
+    //msCore = Il2cpp::GetAssembly("mscorlib")->getImage();
 
     // // HOOKS
     REPLACE_NAME("GameManager", "Update", GameManager_Update);
@@ -174,6 +230,7 @@ void *hack_thread(void *)
     REPLACE_NAME("PauseMenuController", "DoShowBestiary", DoShowBestiary);
     REPLACE_NAME("GameManager", "DoGameOver", DoGameOver);
     REPLACE_NAME("SettingService", "get_SettingData", getSettingData);
+    REPLACE_NAME_ORIG("GameMain.ProcedureOfflineContinue", ".ctor", Class_ctor, o_Class_ctor);
 
     //REPLACE_NAME_ORIG("Game.Sample.Class", ".ctor", Class_ctor, o_Class_ctor);
 
@@ -195,8 +252,11 @@ jobjectArray GetFeatureList(JNIEnv *env, [[maybe_unused]] jobject context)
         OBFUSCATE("Button_Enter The Breach"),
         OBFUSCATE("Button_Fix Black Screen"),
         OBFUSCATE("Button_Enable Cult of the Lamb Event"),
-        OBFUSCATE("Button_Load Character Select"),
-        OBFUSCATE("SeekBar_Camera Scale_1_3")};
+        OBFUSCATE("SeekBar_Camera Scale_1_3"),
+        OBFUSCATE("Button_Enable Cultist"),
+        OBFUSCATE("Button_Enable All Characters"),
+        OBFUSCATE("Load Saved Game"),
+        OBFUSCATE("Button_Load Character Select")};
 
     // Now you dont have to manually update the number everytime;
     int Total_Feature = (sizeof features / sizeof features[0]);
@@ -239,14 +299,34 @@ void Changes(JNIEnv *env, [[maybe_unused]] jclass clazz, [[maybe_unused]] jobjec
         }
         case 3:
         {
-            charSelect = true;
-            enableEnglish = true;
-            break;
-        }
-        case 4:
-        {
             camScale = value;
             setCamScale = true;
+            break;
+        }
+        case 4: 
+        {
+            if (proOfflineCont != nullptr) {
+                LOGD("Found procedureOfflineContinue!");
+                auto doubleStrategy = proOfflineCont->invoke_method<Il2CppObject*>("CreateLoginOfflineContinueStrategy", 2);
+                doubleStrategy->invoke_method<void>("TryContinue");
+            } else {
+                LOGD("procedureOfflineContinue! is null");
+            }
+            break;
+
+        }
+        case 5:
+        {
+            break;
+        }
+        case 6:
+        {
+            break;
+        }
+        case 7:
+        {
+            charSelect = true;
+            enableEnglish = true;
             break;
         }
     }
