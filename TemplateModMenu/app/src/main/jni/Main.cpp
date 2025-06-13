@@ -48,8 +48,14 @@ bool showLoginScreen = false;
 int camScale = 1;
 bool setCamScale = false;
 bool enableEnglish = true;
+int runSeed = -1;
+bool getSeed = false;
+bool setSeed = false;
+int seedValue = 1;
+bool enableCultist = false;
+bool loadSave = false;
+bool enableAll = false;
 Il2CppObject* proOfflineCont = nullptr;
-
 
 
 void GameManager_Update(Il2CppObject *instance) {
@@ -59,7 +65,6 @@ void GameManager_Update(Il2CppObject *instance) {
         if(enterMainScene) {
             instance->invoke_method<void>("EnterMainScene", 1);
             enterMainScene = false;  // because we only want to call the method once
-            enableEnglish = true;
         }
         if (forceUnpause) {
             instance->invoke_method<void>("ForceUnpause");
@@ -73,7 +78,6 @@ void GameManager_Update(Il2CppObject *instance) {
         if (charSelect) {
             instance->invoke_method<void>("LoadCharacterSelect", 1, 0, 0);
             charSelect = false;
-            enableEnglish = true;
         }
         if (returnToFoyer) {
             instance->invoke_method<void>("ReturnToFoyer");
@@ -94,30 +98,63 @@ void GameManager_Update(Il2CppObject *instance) {
             }
             setCamScale = false;
         }
+        if (enableCultist) {
+             if (proOfflineCont != nullptr) {
+                LOGD("Found procedureOfflineContinue!");
+                auto doubleStrategy = proOfflineCont->invoke_method<Il2CppObject*>("CreateLoginOfflineContinueStrategy", 2);
+                doubleStrategy->invoke_method<void>("TryContinue");
+            } else {
+                LOGD("procedureOfflineContinue! is null");
+            }
+            enableCultist = false;
+        }
+        if (loadSave) {
+            if (proOfflineCont != nullptr) {
+                LOGD("Found procedureOfflineContinue!");
+                auto singleStrategy = proOfflineCont->invoke_method<Il2CppObject*>("CreateLoginOfflineContinueStrategy", 1);
+                singleStrategy->invoke_method<void>("TryContinue");
+            } else {
+                LOGD("procedureOfflineContinue! is null");
+            }
+            loadSave = false;
+        }
+        if (enableAll) {
+            if (proOfflineCont != nullptr) {
+                LOGD("Found procedureOfflineContinue!");
+                auto doubleStrategy = proOfflineCont->invoke_method<Il2CppObject*>("CreateLoginOfflineContinueStrategy", 2);
+                doubleStrategy->invoke_method<void>("HandleOfflineContinue");
+
+            } else {
+                LOGD("procedureOfflineContinue! is null");
+            }
+            enableAll = false;
+        }
+        return instance->invoke_method<void>("Update");
+
     }
-    return instance->invoke_method<void>("Update");
 }
 
 Il2CppObject* getSettingData(Il2CppObject *instance) {
     if (enableEnglish) {
+        LOGD("ENGLISH APPLIED!");
         instance->invoke_method<void>("ApplyLanguage", 10);
         enableEnglish = false;
     }
-
     return instance->invoke_method<Il2CppObject*>("get_SettingData");
+
 }
 
 
-
 void OnLoginClick(Il2CppObject *instance) {
-    LOGD("OnLoginClick");
+    LOGD("OnLoginClick called");
     enterMainScene = true;
-    enableEnglish = true;
+    
 }
 
 void DoShowBestiary(Il2CppObject *instance, Il2CppObject *control, Il2CppObject *mouseEvent) {
     LOGD("DoShowBestiary");
     forceUnpause = true;
+    
 }
 
 void DoGameOver(Il2CppObject *instance, Il2CppObject *gameOverSource) {
@@ -130,6 +167,16 @@ void Class_ctor(Il2CppObject *instance)
 {
     o_Class_ctor(instance);
     proOfflineCont = instance;
+}
+
+
+void DoEnableAll(Il2CppObject *instance) {
+    LOGD("Enable All Stuff");
+    instance->invoke_method<void>("OnBtnContinueClick");
+    instance->invoke_method<void>("OnBtnLeaveClick");
+    instance->invoke_method<void>("OnBtnLeaveClick");
+    enterMainScene = true;
+
 }
 
 
@@ -174,10 +221,6 @@ Il2CppObject* FindProcedureOfflineContinue() {
 }
 */
 
-struct UnityEngine_Vector3
-{
-    float x, y, z;
-};
 /*
 void Class_set_Position(Il2CppObject *instance, UnityEngine_Vector3 pos)
 {
@@ -226,11 +269,12 @@ void *hack_thread(void *)
 
     // // HOOKS
     REPLACE_NAME("GameManager", "Update", GameManager_Update);
-    REPLACE_NAME("GameMain.ProcedureLogin", "OnLoginClick", OnLoginClick);
+    REPLACE_NAME("UILoginMenuWindow", "OnLoginClick", OnLoginClick);
     REPLACE_NAME("PauseMenuController", "DoShowBestiary", DoShowBestiary);
     REPLACE_NAME("GameManager", "DoGameOver", DoGameOver);
     REPLACE_NAME("SettingService", "get_SettingData", getSettingData);
     REPLACE_NAME_ORIG("GameMain.ProcedureOfflineContinue", ".ctor", Class_ctor, o_Class_ctor);
+    REPLACE_NAME("UIContinueConfirmWindow", "OnBtnLeaveClick", DoEnableAll);
 
     //REPLACE_NAME_ORIG("Game.Sample.Class", ".ctor", Class_ctor, o_Class_ctor);
 
@@ -244,18 +288,22 @@ void *hack_thread(void *)
 }
 
 
+
 jobjectArray GetFeatureList(JNIEnv *env, [[maybe_unused]] jobject context)
 {
     jobjectArray ret;
 
+
+
+
     const char *features[] = {
         OBFUSCATE("Button_Enter The Breach"),
-        OBFUSCATE("Button_Fix Black Screen"),
+        OBFUSCATE("Button_Fix Screen Bugs"),
         OBFUSCATE("Button_Enable Cult of the Lamb Event"),
         OBFUSCATE("SeekBar_Camera Scale_1_3"),
         OBFUSCATE("Button_Enable Cultist"),
+        OBFUSCATE("Button_Try Load Autosave"),
         OBFUSCATE("Button_Enable All Characters"),
-        OBFUSCATE("Load Saved Game"),
         OBFUSCATE("Button_Load Character Select")};
 
     // Now you dont have to manually update the number everytime;
@@ -290,6 +338,9 @@ void Changes(JNIEnv *env, [[maybe_unused]] jclass clazz, [[maybe_unused]] jobjec
         case 1:
         {
             forceUnpause = true;
+            enterMainScene = true;
+            enableEnglish = true;
+
             break;
         }
         case 2:
@@ -305,22 +356,25 @@ void Changes(JNIEnv *env, [[maybe_unused]] jclass clazz, [[maybe_unused]] jobjec
         }
         case 4: 
         {
-            if (proOfflineCont != nullptr) {
-                LOGD("Found procedureOfflineContinue!");
-                auto doubleStrategy = proOfflineCont->invoke_method<Il2CppObject*>("CreateLoginOfflineContinueStrategy", 2);
-                doubleStrategy->invoke_method<void>("TryContinue");
-            } else {
-                LOGD("procedureOfflineContinue! is null");
-            }
+            enableCultist = true;
+            enableEnglish = true;
+
+           
             break;
 
         }
         case 5:
         {
+            loadSave = true;
+            enableEnglish = true;
+
             break;
         }
         case 6:
         {
+            enableAll = true;
+            enableEnglish = true;
+
             break;
         }
         case 7:
