@@ -140,7 +140,7 @@ void Init(JNIEnv *env, jobject thiz, jobject ctx, jobject title, jobject subtitl
     //    //Set sub title
     setText(env, subtitle,
             OBFUSCATE("<b><marquee><p style=\"font-size:30\">"
-                      "Modded by TheExploration | Punctulate</p>"
+                      "Modded by TheExploration | Punctulate | TrueMLGPro</p>"
                       "</marquee></b>"));
 
     // Dialog Example

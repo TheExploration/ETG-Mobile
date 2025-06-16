@@ -14,7 +14,7 @@
 #define targetLibName OBFUSCATE("libil2cpp.so")
 
 Il2CppImage *g_Image = nullptr;
-Il2CppImage *unityCore = nullptr;
+//Il2CppImage *unityCore = nullptr;
 //Il2CppImage *msCore = nullptr;
 
 // exmaple dump.cs
@@ -55,6 +55,10 @@ int seedValue = 1;
 bool enableCultist = false;
 bool loadSave = false;
 bool enableAll = false;
+bool initAmmonomicon = true;
+bool updateUrl = false;
+bool saveGame = false;
+bool precash = false;
 Il2CppObject* proOfflineCont = nullptr;
 
 
@@ -64,6 +68,7 @@ void GameManager_Update(Il2CppObject *instance) {
     if(instance!=nullptr) {
         if(enterMainScene) {
             instance->invoke_method<void>("EnterMainScene", 1);
+            precash = true;
             enterMainScene = false;  // because we only want to call the method once
         }
         if (forceUnpause) {
@@ -77,10 +82,12 @@ void GameManager_Update(Il2CppObject *instance) {
         }
         if (charSelect) {
             instance->invoke_method<void>("LoadCharacterSelect", 1, 0, 0);
+            precash = true;
             charSelect = false;
         }
         if (returnToFoyer) {
             instance->invoke_method<void>("ReturnToFoyer");
+            precash = true;
             returnToFoyer = false;
         }
         if (setCamScale) {
@@ -118,6 +125,13 @@ void GameManager_Update(Il2CppObject *instance) {
             }
             loadSave = false;
         }
+        
+        if (saveGame) {
+            LOGD("Saved Game!");
+            instance->invoke_method<void>("SaveMidGameData");
+            saveGame = false;
+        }
+
         if (enableAll) {
             if (proOfflineCont != nullptr) {
                 LOGD("Found procedureOfflineContinue!");
@@ -150,12 +164,39 @@ void OnLoginClick(Il2CppObject *instance) {
     enterMainScene = true;
     
 }
+/*
+void WikiUpdate(Il2CppObject *instance) {
+    if (updateUrl) {
+        auto webViewClass = g_Image->getClass("UIUniWebView");
+        if (webViewClass != nullptr) {
+            auto field = webViewClass->getField("wikiUrl");
+            if (field != nullptr) {
+                auto newUrl = Il2cpp::NewString("https://enterthegungeon.wiki.gg/");
+                field->setStaticValue(newUrl);
+            }
+        }
+        updateUrl = false;
+    }
 
-void DoShowBestiary(Il2CppObject *instance, Il2CppObject *control, Il2CppObject *mouseEvent) {
-    LOGD("DoShowBestiary");
-    forceUnpause = true;
-    
+    return instance->invoke_method<void>("Update");
+}*/
+
+void AmmonomiconLateUpdate(Il2CppObject *instance) {
+    if (initAmmonomicon) {
+        if (precash) {
+            LOGD("PrecacheAllData");
+
+            instance->invoke_method<void>("PrecacheAllData");
+            initAmmonomicon = false;
+            updateUrl = true;
+
+        }
+        LOGD("LateUpdate AMMO");
+    }
+
+    return instance->invoke_method<void>("LateUpdate");
 }
+
 
 void DoGameOver(Il2CppObject *instance, Il2CppObject *gameOverSource) {
     LOGD("DoGameOver");
@@ -264,17 +305,19 @@ void *hack_thread(void *)
 
     LOGD(OBFUSCATE("HOOKING..."));
     g_Image = Il2cpp::GetAssembly("Assembly-CSharp")->getImage();
-    unityCore = Il2cpp::GetAssembly("UnityEngine.CoreModule")->getImage();
+    //unityCore = Il2cpp::GetAssembly("UnityEngine.CoreModule")->getImage();
     //msCore = Il2cpp::GetAssembly("mscorlib")->getImage();
 
     // // HOOKS
     REPLACE_NAME("GameManager", "Update", GameManager_Update);
     REPLACE_NAME("UILoginMenuWindow", "OnLoginClick", OnLoginClick);
-    REPLACE_NAME("PauseMenuController", "DoShowBestiary", DoShowBestiary);
+//    REPLACE_NAME("PauseMenuController", "DoShowBestiary", DoShowBestiary);
     REPLACE_NAME("GameManager", "DoGameOver", DoGameOver);
     REPLACE_NAME("SettingService", "get_SettingData", getSettingData);
     REPLACE_NAME_ORIG("GameMain.ProcedureOfflineContinue", ".ctor", Class_ctor, o_Class_ctor);
     REPLACE_NAME("UIContinueConfirmWindow", "OnBtnLeaveClick", DoEnableAll);
+    REPLACE_NAME("AmmonomiconController", "LateUpdate", AmmonomiconLateUpdate);
+//    REPLACE_NAME("UIUniWebView", "Update", WikiUpdate);
 
     //REPLACE_NAME_ORIG("Game.Sample.Class", ".ctor", Class_ctor, o_Class_ctor);
 
@@ -303,6 +346,7 @@ jobjectArray GetFeatureList(JNIEnv *env, [[maybe_unused]] jobject context)
         OBFUSCATE("SeekBar_Camera Scale_1_3"),
         OBFUSCATE("Button_Enable Cultist"),
         OBFUSCATE("Button_Try Load Autosave"),
+        OBFUSCATE("Button_Save Mid Game"),
         OBFUSCATE("Button_Enable All Characters"),
         OBFUSCATE("Button_Load Character Select")};
 
@@ -370,14 +414,20 @@ void Changes(JNIEnv *env, [[maybe_unused]] jclass clazz, [[maybe_unused]] jobjec
 
             break;
         }
-        case 6:
+        case 6: 
+        {
+            saveGame = true;
+            enableEnglish = true;
+            break;
+        }
+        case 7:
         {
             enableAll = true;
             enableEnglish = true;
 
             break;
         }
-        case 7:
+        case 8:
         {
             charSelect = true;
             enableEnglish = true;

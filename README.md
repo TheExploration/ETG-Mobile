@@ -31,3 +31,6 @@ Then sign the apk and done
 - [Zygisk-Il2CppDumper](https://github.com/Perfare/Zygisk-Il2CppDumper)
 - [frida-il2cpp-bridge](https://github.com/vfsfitvnm/frida-il2cpp-bridge)
 - [ModTemplate](https://github.com/catlowlevel/ModTemplate)
+
+## Special Thanks
+ - [TrueMLGPro](https://github.com/TrueMLGPro)
