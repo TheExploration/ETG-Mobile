@@ -27,6 +27,13 @@ python build.py base.apk
 
 Then sign the apk and done
 
+## Usage
+1. Download the APK in [releases](https://github.com/TheExploration/ETG-Mobile/releases/latest)
+2. Make sure your system language is set to English.
+3. Accept the agreement on the main menu.
+4. Use mod menu or press "TAPTAP"
+
+
 ## Credits
 - [Zygisk-Il2CppDumper](https://github.com/Perfare/Zygisk-Il2CppDumper)
 - [frida-il2cpp-bridge](https://github.com/vfsfitvnm/frida-il2cpp-bridge)
