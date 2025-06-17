@@ -14,6 +14,9 @@
 #define targetLibName OBFUSCATE("libil2cpp.so")
 
 Il2CppImage *g_Image = nullptr;
+Il2CppImage *XDSDK = nullptr;
+Il2CppImage *runTime = nullptr;
+
 //Il2CppImage *unityCore = nullptr;
 //Il2CppImage *msCore = nullptr;
 
@@ -68,7 +71,6 @@ void GameManager_Update(Il2CppObject *instance) {
     if(instance!=nullptr) {
         if(enterMainScene) {
             instance->invoke_method<void>("EnterMainScene", 1);
-            precash = true;
             enterMainScene = false;  // because we only want to call the method once
         }
         if (forceUnpause) {
@@ -82,12 +84,10 @@ void GameManager_Update(Il2CppObject *instance) {
         }
         if (charSelect) {
             instance->invoke_method<void>("LoadCharacterSelect", 1, 0, 0);
-            precash = true;
             charSelect = false;
         }
         if (returnToFoyer) {
             instance->invoke_method<void>("ReturnToFoyer");
-            precash = true;
             returnToFoyer = false;
         }
         if (setCamScale) {
@@ -183,26 +183,28 @@ void WikiUpdate(Il2CppObject *instance) {
 
 void AmmonomiconLateUpdate(Il2CppObject *instance) {
     if (initAmmonomicon) {
-        if (precash) {
-            LOGD("PrecacheAllData");
+        
+        LOGD("PrecacheAllData");
 
-            instance->invoke_method<void>("PrecacheAllData");
-            initAmmonomicon = false;
-            updateUrl = true;
-
-        }
-        LOGD("LateUpdate AMMO");
+        instance->invoke_method<void>("PrecacheAllData");
+        initAmmonomicon = false;
     }
 
     return instance->invoke_method<void>("LateUpdate");
 }
 
+void InitSDK(Il2CppObject *instance, Il2CppObject *callback) {
+    instance->invoke_method<void>("disableAgreementUI");
 
+    return instance->invoke_method<void>("InitSDK", callback);
+} 
+
+/*
 void DoGameOver(Il2CppObject *instance, Il2CppObject *gameOverSource) {
     LOGD("DoGameOver");
     returnToFoyer = true;
 }
-
+*/
 void (*o_Class_ctor)(Il2CppObject *);
 void Class_ctor(Il2CppObject *instance)
 {
@@ -218,6 +220,11 @@ void DoEnableAll(Il2CppObject *instance) {
     instance->invoke_method<void>("OnBtnLeaveClick");
     enterMainScene = true;
 
+}
+
+bool IsConnectedInternet() {
+    LOGD("FORCE INTERNET");
+    return true;
 }
 
 
@@ -305,6 +312,8 @@ void *hack_thread(void *)
 
     LOGD(OBFUSCATE("HOOKING..."));
     g_Image = Il2cpp::GetAssembly("Assembly-CSharp")->getImage();
+    XDSDK = Il2cpp::GetAssembly("XDSDK.Runtime")->getImage();
+    runTime = Il2cpp::GetAssembly("XD.SDK.Common.Mobile.Runtime")->getImage();
     //unityCore = Il2cpp::GetAssembly("UnityEngine.CoreModule")->getImage();
     //msCore = Il2cpp::GetAssembly("mscorlib")->getImage();
 
@@ -312,11 +321,14 @@ void *hack_thread(void *)
     REPLACE_NAME("GameManager", "Update", GameManager_Update);
     REPLACE_NAME("UILoginMenuWindow", "OnLoginClick", OnLoginClick);
 //    REPLACE_NAME("PauseMenuController", "DoShowBestiary", DoShowBestiary);
-    REPLACE_NAME("GameManager", "DoGameOver", DoGameOver);
+//    REPLACE_NAME("GameManager", "DoGameOver", DoGameOver);
     REPLACE_NAME("SettingService", "get_SettingData", getSettingData);
     REPLACE_NAME_ORIG("GameMain.ProcedureOfflineContinue", ".ctor", Class_ctor, o_Class_ctor);
     REPLACE_NAME("UIContinueConfirmWindow", "OnBtnLeaveClick", DoEnableAll);
     REPLACE_NAME("AmmonomiconController", "LateUpdate", AmmonomiconLateUpdate);
+    REPLACE_NAME_KLASS(XDSDK->getClass(OBFUSCATE("XDSDKAgent.SDKEntry")), "IsConnectedInternet", IsConnectedInternet);
+    REPLACE_NAME_KLASS(runTime->getClass(OBFUSCATE("XD.SDK.Common.XDGCommonMobileImpl")), "InitSDK", InitSDK);
+
 //    REPLACE_NAME("UIUniWebView", "Update", WikiUpdate);
 
     //REPLACE_NAME_ORIG("Game.Sample.Class", ".ctor", Class_ctor, o_Class_ctor);
