@@ -144,8 +144,15 @@ Il2CppObject* getSettingData(Il2CppObject *instance) {
 
 }
 
-void showMouseCursor(Il2CppObject *instance) 
+bool showMouseCursor(Il2CppObject *instance) {
+    if (showCrosshair) {
+        LOGD("SHOW CROSSHAIR");
+        return true;
+    } else {
+        return false;
+    }
 }
+
 
 void OnLoginClick(Il2CppObject *instance) {
     LOGD("OnLoginClick called");
@@ -294,7 +301,7 @@ void *hack_thread(void *)
 //    REPLACE_NAME("PauseMenuController", "DoShowBestiary", DoShowBestiary);
 //    REPLACE_NAME("GameManager", "DoGameOver", DoGameOver);
     REPLACE_NAME("SettingService", "get_SettingData", getSettingData);
-    REPLACE_NAME("GameCursorController", "showMouseCursor", showMouseCursor);
+    REPLACE_NAME("GameCursorController", "get_showMouseCursor", showMouseCursor);
     
     REPLACE_NAME_ORIG("GameMain.ProcedureOfflineContinue", ".ctor", Class_ctor, o_Class_ctor);
     REPLACE_NAME("UIContinueConfirmWindow", "OnBtnLeaveClick", DoEnableAll);
