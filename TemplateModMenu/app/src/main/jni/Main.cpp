@@ -65,32 +65,19 @@ bool precash = false;
 Il2CppObject* proOfflineCont = nullptr;
 
 
-
-
 void GameManager_Update(Il2CppObject *instance) {
     LOGD("update Called: %f, %f, %f");
 
     if(instance!=nullptr) {
-        if(enterMainScene) {
-            instance->invoke_method<void>("EnterMainScene", 1);
-            enterMainScene = false;  // because we only want to call the method once
-        }
+       
         if (forceUnpause) {
             instance->invoke_method<void>("ForceUnpause");
             forceUnpause = false;
         }
-        if (enableSheep) {
+       
+        if (enableCrosshair) {
             auto gmClass = g_Image->getClass("GameManager");
-            gmClass->invoke_static_method<void>("SetBaaBaaActive", 1);
-            enableSheep = false;
-        }
-        if (charSelect) {
-            instance->invoke_method<void>("LoadCharacterSelect", 1, 0, 0);
-            charSelect = false;
-        }
-        if (returnToFoyer) {
-            instance->invoke_method<void>("ReturnToFoyer");
-            returnToFoyer = false;
+            gmClass->invoke_static_method<void>("SetCrosshairEnabled", true);
         }
         if (setCamScale) {
             auto gmClass = g_Image->getClass("GameManager");
@@ -166,6 +153,22 @@ void OnLoginClick(Il2CppObject *instance) {
     enterMainScene = true;
     
 }
+/*
+void WikiUpdate(Il2CppObject *instance) {
+    if (updateUrl) {
+        auto webViewClass = g_Image->getClass("UIUniWebView");
+        if (webViewClass != nullptr) {
+            auto field = webViewClass->getField("wikiUrl");
+            if (field != nullptr) {
+                auto newUrl = Il2cpp::NewString("https://enterthegungeon.wiki.gg/");
+                field->setStaticValue(newUrl);
+            }
+        }
+        updateUrl = false;
+    }
+
+    return instance->invoke_method<void>("Update");
+}*/
 
 void AmmonomiconLateUpdate(Il2CppObject *instance) {
     if (initAmmonomicon) {
@@ -191,6 +194,27 @@ void DoGameOver(Il2CppObject *instance, Il2CppObject *gameOverSource) {
     returnToFoyer = true;
 }
 */
+void (*o_Class_ctor)(Il2CppObject *);
+void Class_ctor(Il2CppObject *instance)
+{
+    o_Class_ctor(instance);
+    proOfflineCont = instance;
+}
+
+
+void DoEnableAll(Il2CppObject *instance) {
+    LOGD("Enable All Stuff");
+    instance->invoke_method<void>("OnBtnContinueClick");
+    instance->invoke_method<void>("OnBtnLeaveClick");
+    instance->invoke_method<void>("OnBtnLeaveClick");
+    enterMainScene = true;
+
+}
+
+bool IsConnectedInternet() {
+    LOGD("FORCE INTERNET");
+    return true;
+}
 
 
 /*
@@ -283,16 +307,16 @@ void *hack_thread(void *)
     //msCore = Il2cpp::GetAssembly("mscorlib")->getImage();
 
     // // HOOKS
-  //  REPLACE_NAME("GameManager", "Update", GameManager_Update);
-  //  REPLACE_NAME("UILoginMenuWindow", "OnLoginClick", OnLoginClick);
+    REPLACE_NAME("GameManager", "Update", GameManager_Update);
+    REPLACE_NAME("UILoginMenuWindow", "OnLoginClick", OnLoginClick);
 //    REPLACE_NAME("PauseMenuController", "DoShowBestiary", DoShowBestiary);
 //    REPLACE_NAME("GameManager", "DoGameOver", DoGameOver);
-    //REPLACE_NAME("SettingService", "get_SettingData", getSettingData);
-   // REPLACE_NAME_ORIG("GameMain.ProcedureOfflineContinue", ".ctor", Class_ctor, o_Class_ctor);
-  ////  REPLACE_NAME("UIContinueConfirmWindow", "OnBtnLeaveClick", DoEnableAll);
-    //REPLACE_NAME("AmmonomiconController", "LateUpdate", AmmonomiconLateUpdate);
-   // REPLACE_NAME_KLASS(XDSDK->getClass(OBFUSCATE("XDSDKAgent.SDKEntry")), "IsConnectedInternet", IsConnectedInternet);
-  //  REPLACE_NAME_KLASS(runTime->getClass(OBFUSCATE("XD.SDK.Common.XDGCommonMobileImpl")), "InitSDK", InitSDK);
+    REPLACE_NAME("SettingService", "get_SettingData", getSettingData);
+    REPLACE_NAME_ORIG("GameMain.ProcedureOfflineContinue", ".ctor", Class_ctor, o_Class_ctor);
+    REPLACE_NAME("UIContinueConfirmWindow", "OnBtnLeaveClick", DoEnableAll);
+    REPLACE_NAME("AmmonomiconController", "LateUpdate", AmmonomiconLateUpdate);
+    REPLACE_NAME_KLASS(XDSDK->getClass(OBFUSCATE("XDSDKAgent.SDKEntry")), "IsConnectedInternet", IsConnectedInternet);
+    REPLACE_NAME_KLASS(runTime->getClass(OBFUSCATE("XD.SDK.Common.XDGCommonMobileImpl")), "InitSDK", InitSDK);
 
 //    REPLACE_NAME("UIUniWebView", "Update", WikiUpdate);
 
