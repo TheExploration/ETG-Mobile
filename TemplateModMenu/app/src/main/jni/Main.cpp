@@ -308,7 +308,7 @@ void *hack_thread(void *)
     REPLACE_NAME_ORIG("GameMain.ProcedureOfflineContinue", ".ctor", Class_ctor, o_Class_ctor);
     REPLACE_NAME("UIContinueConfirmWindow", "OnBtnLeaveClick", DoEnableAll);
     REPLACE_NAME("AmmonomiconController", "LateUpdate", AmmonomiconLateUpdate);
-    REPLACE_NAME_KLASS(XDSDK->getClass(OBFUSCATE("XDSDKAgent.SDKEntry")), "IsConnectedInternet", IsConnectedInternet);
+   /// REPLACE_NAME_KLASS(XDSDK->getClass(OBFUSCATE("XDSDKAgent.SDKEntry")), "IsConnectedInternet", IsConnectedInternet);
     REPLACE_NAME_KLASS(runTime->getClass(OBFUSCATE("XD.SDK.Common.XDGCommonMobileImpl")), "InitSDK", InitSDK);
 
 //    REPLACE_NAME("UIUniWebView", "Update", WikiUpdate);
