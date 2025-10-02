@@ -62,6 +62,7 @@ bool initAmmonomicon = true;
 bool updateUrl = false;
 bool saveGame = false;
 bool precash = false;
+bool developerGUI = false;
 bool showCrosshair = false;
 Il2CppObject* proOfflineCont = nullptr;
 
@@ -352,9 +353,9 @@ jobjectArray GetFeatureList(JNIEnv *env, [[maybe_unused]] jobject context)
 
 
     const char *features[] = {
-        OBFUSCATE("Button_Enter The Breach"),
+        OBFUSCATE("Button_Developer Gui"),
         OBFUSCATE("Button_Fix Screen Bugs"),
-        OBFUSCATE("Button_Enable Cult of the Lamb Event"),
+        OBFUSCATE("Button_Enable Crosshair"),
         OBFUSCATE("SeekBar_Camera Scale_1_3"),
         OBFUSCATE("Button_Enable Cultist"),
         OBFUSCATE("Button_Try Load Autosave"),
@@ -387,21 +388,17 @@ void Changes(JNIEnv *env, [[maybe_unused]] jclass clazz, [[maybe_unused]] jobjec
     {
         case 0:
         {
-            enterMainScene = true;
-            enableEnglish = true;
+            developerGUI = true;
             break;
         }
         case 1:
         {
             forceUnpause = true;
-            enterMainScene = true;
-            enableEnglish = true;
-
             break;
         }
         case 2:
         {
-            enableSheep = true;
+            showCrosshair = true;
             break;
         }
         case 3:
