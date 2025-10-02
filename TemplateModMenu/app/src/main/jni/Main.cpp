@@ -170,23 +170,6 @@ void WikiUpdate(Il2CppObject *instance) {
     return instance->invoke_method<void>("Update");
 }*/
 
-void AmmonomiconLateUpdate(Il2CppObject *instance) {
-    if (initAmmonomicon) {
-        
-        LOGD("PrecacheAllData");
-
-        instance->invoke_method<void>("PrecacheAllData");
-        initAmmonomicon = false;
-    }
-
-    return instance->invoke_method<void>("LateUpdate");
-}
-
-void InitSDK(Il2CppObject *instance, Il2CppObject *callback) {
-    instance->invoke_method<void>("disableAgreementUI");
-
-    return instance->invoke_method<void>("InitSDK", callback);
-} 
 
 /*
 void DoGameOver(Il2CppObject *instance, Il2CppObject *gameOverSource) {
