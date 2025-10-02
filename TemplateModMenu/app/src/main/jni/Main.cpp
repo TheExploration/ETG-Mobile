@@ -153,6 +153,20 @@ bool showMouseCursor(Il2CppObject *instance) {
     }
 }
 
+bool showControllerCursor(Il2CppObject *instance) {
+    if (showCrosshair) {
+        LOGD("SHOW CROSSHAIR");
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void GodModeManager_Update(Il2CppObject *instance) {
+    if ()
+    return instance->invoke_method<void>("Update");
+}
+
 
 void OnLoginClick(Il2CppObject *instance) {
     LOGD("OnLoginClick called");
@@ -303,6 +317,7 @@ void *hack_thread(void *)
     REPLACE_NAME("SettingService", "get_SettingData", getSettingData);
     REPLACE_NAME("GameCursorController", "get_showMouseCursor", showMouseCursor);
     REPLACE_NAME("GameCursorController", "get_showPlayerOneControllerCursor", showControllerCursor);
+    REPLACE_NAME("GodModeManager", "Update", GodModeManager_Update);
 
     
     REPLACE_NAME_ORIG("GameMain.ProcedureOfflineContinue", ".ctor", Class_ctor, o_Class_ctor);
