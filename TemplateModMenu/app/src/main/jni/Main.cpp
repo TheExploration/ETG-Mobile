@@ -163,7 +163,10 @@ bool showControllerCursor(Il2CppObject *instance) {
 }
 
 void GodModeManager_Update(Il2CppObject *instance) {
-    if ()
+    if (developerGUI) {
+        instance->invoke_method<void>("OnClick");
+        developerGUI = false;
+    }
     return instance->invoke_method<void>("Update");
 }
 
