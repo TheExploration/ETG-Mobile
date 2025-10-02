@@ -76,8 +76,9 @@ void GameManager_Update(Il2CppObject *instance) {
         }
        
         if (enableCrosshair) {
-            auto gmClass = g_Image->getClass("GameManager");
-            gmClass->invoke_static_method<void>("SetCrosshairEnabled", true);
+            auto gmClass = g_Image->getClass("GameCursorController");
+            gmClass->invoke_static_method<void>("showMouseCursor", true);
+            gmClass->invoke_static_method<void>("showPlayerOneControllerCursor", 1);
         }
         if (setCamScale) {
             auto gmClass = g_Image->getClass("GameManager");
