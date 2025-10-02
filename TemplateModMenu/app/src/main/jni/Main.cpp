@@ -62,6 +62,7 @@ bool initAmmonomicon = true;
 bool updateUrl = false;
 bool saveGame = false;
 bool precash = false;
+bool showCrosshair = false;
 Il2CppObject* proOfflineCont = nullptr;
 
 
@@ -75,11 +76,6 @@ void GameManager_Update(Il2CppObject *instance) {
             forceUnpause = false;
         }
        
-        if (enableCrosshair) {
-            auto gmClass = g_Image->getClass("GameCursorController");
-            gmClass->invoke_static_method<void>("showMouseCursor", true);
-            gmClass->invoke_static_method<void>("showPlayerOneControllerCursor", 1);
-        }
         if (setCamScale) {
             auto gmClass = g_Image->getClass("GameManager");
             LOGD("Camera Scale is", camScale);
@@ -296,6 +292,8 @@ void *hack_thread(void *)
 //    REPLACE_NAME("PauseMenuController", "DoShowBestiary", DoShowBestiary);
 //    REPLACE_NAME("GameManager", "DoGameOver", DoGameOver);
     REPLACE_NAME("SettingService", "get_SettingData", getSettingData);
+    REPLACE_NAME("GameCursorController", "showMouseCursor", showMouseCursor);
+    
     REPLACE_NAME_ORIG("GameMain.ProcedureOfflineContinue", ".ctor", Class_ctor, o_Class_ctor);
     REPLACE_NAME("UIContinueConfirmWindow", "OnBtnLeaveClick", DoEnableAll);
     REPLACE_NAME("AmmonomiconController", "LateUpdate", AmmonomiconLateUpdate);
