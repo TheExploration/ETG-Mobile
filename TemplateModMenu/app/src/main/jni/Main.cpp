@@ -302,6 +302,8 @@ void *hack_thread(void *)
 //    REPLACE_NAME("GameManager", "DoGameOver", DoGameOver);
     REPLACE_NAME("SettingService", "get_SettingData", getSettingData);
     REPLACE_NAME("GameCursorController", "get_showMouseCursor", showMouseCursor);
+    REPLACE_NAME("GameCursorController", "get_showPlayerOneControllerCursor", showControllerCursor);
+
     
     REPLACE_NAME_ORIG("GameMain.ProcedureOfflineContinue", ".ctor", Class_ctor, o_Class_ctor);
     REPLACE_NAME("UIContinueConfirmWindow", "OnBtnLeaveClick", DoEnableAll);
