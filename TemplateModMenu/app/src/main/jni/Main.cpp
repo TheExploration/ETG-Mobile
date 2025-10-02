@@ -144,6 +144,8 @@ Il2CppObject* getSettingData(Il2CppObject *instance) {
 
 }
 
+void showMouseCursor(Il2CppObject *instance) 
+}
 
 void OnLoginClick(Il2CppObject *instance) {
     LOGD("OnLoginClick called");
