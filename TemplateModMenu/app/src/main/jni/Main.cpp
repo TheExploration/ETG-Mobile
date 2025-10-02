@@ -65,6 +65,8 @@ bool precash = false;
 Il2CppObject* proOfflineCont = nullptr;
 
 
+
+
 void GameManager_Update(Il2CppObject *instance) {
     LOGD("update Called: %f, %f, %f");
 
