@@ -134,7 +134,7 @@ void GameManager_Update(Il2CppObject *instance) {
 
     }
 }
-
+/*
 Il2CppObject* getSettingData(Il2CppObject *instance) {
     if (enableEnglish) {
         LOGD("ENGLISH APPLIED!");
@@ -143,7 +143,7 @@ Il2CppObject* getSettingData(Il2CppObject *instance) {
     }
     return instance->invoke_method<Il2CppObject*>("get_SettingData");
 
-}
+}*/
 
 bool showMouseCursor(Il2CppObject *instance) {
     if (showCrosshair) {
@@ -171,12 +171,13 @@ void GodModeManager_Update(Il2CppObject *instance) {
     return instance->invoke_method<void>("Update");
 }
 
-
+/*
 void OnLoginClick(Il2CppObject *instance) {
     LOGD("OnLoginClick called");
     enterMainScene = true;
     
-}
+}*/
+
 /*
 void WikiUpdate(Il2CppObject *instance) {
     if (updateUrl) {
@@ -217,12 +218,12 @@ void DoEnableAll(Il2CppObject *instance) {
     enterMainScene = true;
 
 }
-
+/*
 bool IsConnectedInternet() {
     LOGD("FORCE INTERNET");
     return true;
 }
-
+*/
 
 /*
 Il2CppObject* FindProcedureOfflineContinue() {
@@ -315,10 +316,10 @@ void *hack_thread(void *)
 
     // // HOOKS
     REPLACE_NAME("GameManager", "Update", GameManager_Update);
-    REPLACE_NAME("UILoginMenuWindow", "OnLoginClick", OnLoginClick);
+    //REPLACE_NAME("UILoginMenuWindow", "OnLoginClick", OnLoginClick);
 //    REPLACE_NAME("PauseMenuController", "DoShowBestiary", DoShowBestiary);
 //    REPLACE_NAME("GameManager", "DoGameOver", DoGameOver);
-    REPLACE_NAME("SettingService", "get_SettingData", getSettingData);
+   // REPLACE_NAME("SettingService", "get_SettingData", getSettingData);
     REPLACE_NAME("GameCursorController", "get_showMouseCursor", showMouseCursor);
     REPLACE_NAME("GameCursorController", "get_showPlayerOneControllerCursor", showControllerCursor);
     REPLACE_NAME("GodModeManager", "Update", GodModeManager_Update);
@@ -326,9 +327,9 @@ void *hack_thread(void *)
     
     REPLACE_NAME_ORIG("GameMain.ProcedureOfflineContinue", ".ctor", Class_ctor, o_Class_ctor);
     REPLACE_NAME("UIContinueConfirmWindow", "OnBtnLeaveClick", DoEnableAll);
-    REPLACE_NAME("AmmonomiconController", "LateUpdate", AmmonomiconLateUpdate);
+    //REPLACE_NAME("AmmonomiconController", "LateUpdate", AmmonomiconLateUpdate);
    /// REPLACE_NAME_KLASS(XDSDK->getClass(OBFUSCATE("XDSDKAgent.SDKEntry")), "IsConnectedInternet", IsConnectedInternet);
-    REPLACE_NAME_KLASS(runTime->getClass(OBFUSCATE("XD.SDK.Common.XDGCommonMobileImpl")), "InitSDK", InitSDK);
+    //REPLACE_NAME_KLASS(runTime->getClass(OBFUSCATE("XD.SDK.Common.XDGCommonMobileImpl")), "InitSDK", InitSDK);
 
 //    REPLACE_NAME("UIUniWebView", "Update", WikiUpdate);
 
@@ -360,8 +361,7 @@ jobjectArray GetFeatureList(JNIEnv *env, [[maybe_unused]] jobject context)
         OBFUSCATE("Button_Enable Cultist"),
         OBFUSCATE("Button_Try Load Autosave"),
         OBFUSCATE("Button_Save Mid Game"),
-        OBFUSCATE("Button_Enable All Characters"),
-        OBFUSCATE("Button_Load Character Select")};
+        OBFUSCATE("Button_Enable All Characters")};
 
     // Now you dont have to manually update the number everytime;
     int Total_Feature = (sizeof features / sizeof features[0]);
@@ -434,12 +434,6 @@ void Changes(JNIEnv *env, [[maybe_unused]] jclass clazz, [[maybe_unused]] jobjec
             enableAll = true;
             enableEnglish = true;
 
-            break;
-        }
-        case 8:
-        {
-            charSelect = true;
-            enableEnglish = true;
             break;
         }
     }
