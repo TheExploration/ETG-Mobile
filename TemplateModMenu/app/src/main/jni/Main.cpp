@@ -62,6 +62,8 @@ bool initAmmonomicon = true;
 bool updateUrl = false;
 bool saveGame = false;
 bool precash = false;
+bool developerGUI = false;
+bool showCrosshair = false;
 Il2CppObject* proOfflineCont = nullptr;
 
 
@@ -228,6 +230,32 @@ bool IsConnectedInternet() {
 }
 
 
+bool showMouseCursor(Il2CppObject *instance) {
+    if (showCrosshair) {
+        LOGD("SHOW CROSSHAIR");
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool showControllerCursor(Il2CppObject *instance) {
+    if (showCrosshair) {
+        LOGD("SHOW CROSSHAIR");
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void GodModeManager_Update(Il2CppObject *instance) {
+    if (developerGUI) {
+        instance->invoke_method<void>("OnClick");
+        developerGUI = false;
+    }
+    return instance->invoke_method<void>("Update");
+}
+
 /*
 Il2CppObject* FindProcedureOfflineContinue() {
     // Get the ProcedureOfflineContinue class
@@ -320,6 +348,11 @@ void *hack_thread(void *)
     // // HOOKS
     REPLACE_NAME("GameManager", "Update", GameManager_Update);
     REPLACE_NAME("UILoginMenuWindow", "OnLoginClick", OnLoginClick);
+    REPLACE_NAME("GameCursorController", "get_showMouseCursor", showMouseCursor);
+    REPLACE_NAME("GameCursorController", "get_showPlayerOneControllerCursor", showControllerCursor);
+    REPLACE_NAME("GodModeManager", "Update", GodModeManager_Update);
+
+
 //    REPLACE_NAME("PauseMenuController", "DoShowBestiary", DoShowBestiary);
 //    REPLACE_NAME("GameManager", "DoGameOver", DoGameOver);
     REPLACE_NAME("SettingService", "get_SettingData", getSettingData);
@@ -352,13 +385,15 @@ jobjectArray GetFeatureList(JNIEnv *env, [[maybe_unused]] jobject context)
 
 
     const char *features[] = {
+        OBFUSCATE("Button_Developer Gui"),
+        OBFUSCATE("Button_Enable Crosshair"),
         OBFUSCATE("Button_Enter The Breach"),
         OBFUSCATE("Button_Fix Screen Bugs"),
         OBFUSCATE("Button_Enable Cult of the Lamb Event"),
         OBFUSCATE("SeekBar_Camera Scale_1_3"),
         OBFUSCATE("Button_Enable Cultist"),
         OBFUSCATE("Button_Try Load Autosave"),
-        OBFUSCATE("Button_Save Mid Game"),
+        OBFUSCATE("Button_Save Mid Run"),
         OBFUSCATE("Button_Enable All Characters"),
         OBFUSCATE("Button_Load Character Select")};
 
@@ -387,11 +422,22 @@ void Changes(JNIEnv *env, [[maybe_unused]] jclass clazz, [[maybe_unused]] jobjec
     {
         case 0:
         {
-            enterMainScene = true;
+            developerGUI = true;
             enableEnglish = true;
             break;
         }
         case 1:
+        {
+            showCrosshair = true;
+            break;
+        }
+        case 2:
+        {
+            enterMainScene = true;
+            enableEnglish = true;
+            break;
+        }
+        case 3:
         {
             forceUnpause = true;
             enterMainScene = true;
@@ -399,18 +445,18 @@ void Changes(JNIEnv *env, [[maybe_unused]] jclass clazz, [[maybe_unused]] jobjec
 
             break;
         }
-        case 2:
+        case 4:
         {
             enableSheep = true;
             break;
         }
-        case 3:
+        case 5:
         {
             camScale = value;
             setCamScale = true;
             break;
         }
-        case 4: 
+        case 6: 
         {
             enableCultist = true;
             enableEnglish = true;
@@ -419,27 +465,27 @@ void Changes(JNIEnv *env, [[maybe_unused]] jclass clazz, [[maybe_unused]] jobjec
             break;
 
         }
-        case 5:
+        case 7:
         {
             loadSave = true;
             enableEnglish = true;
 
             break;
         }
-        case 6: 
+        case 8: 
         {
             saveGame = true;
             enableEnglish = true;
             break;
         }
-        case 7:
+        case 9:
         {
             enableAll = true;
             enableEnglish = true;
 
             break;
         }
-        case 8:
+        case 10:
         {
             charSelect = true;
             enableEnglish = true;

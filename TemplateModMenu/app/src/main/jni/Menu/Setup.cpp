@@ -135,12 +135,12 @@ void CheckOverlayPermission(JNIEnv *env, jclass thiz, jobject ctx)
 void Init(JNIEnv *env, jobject thiz, jobject ctx, jobject title, jobject subtitle)
 {
     // Set sub title
-    setText(env, title, OBFUSCATE("<b>Enter The Gungeon</b>"));
+    setText(env, title, OBFUSCATE("<b>Mod The Gungeon</b>"));
 
     //    //Set sub title
     setText(env, subtitle,
             OBFUSCATE("<b><marquee><p style=\"font-size:30\">"
-                      "Modded by TheExploration | Punctulate | TrueMLGPro</p>"
+                      "Modded by hah | Punctulate | TrueMLGPro</p>"
                       "</marquee></b>"));
 
     // Dialog Example
